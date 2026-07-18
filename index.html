@@ -57,46 +57,10 @@
     .btn-sm { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     .btn-sm:hover { border-color: #ef4444; color: #fca5a5; }
 
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
     .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; max-width: 580px; margin: 0 auto 20px; }
-    .last-ip-block {
-      background: linear-gradient(135deg, #0f2027, #1a1a2e);
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 14px 18px;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .last-ip-label {
-      font-size: 10px;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 5px;
-    }
-    .last-ip-val {
-      font-family: 'Space Grotesk', monospace;
-      font-size: 20px;
-      font-weight: 700;
-      color: #e2e8f0;
-      letter-spacing: 0.5px;
-    }
-    .last-ip-time {
-      font-size: 11px;
-      color: #475569;
-      text-align: right;
-    }
-    .last-ip-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 6px #10b981;
-      margin-right: 6px;
-      display: inline-block;
-    }
     .ip-block { background: #0f172a; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
     .ip-block.v6 { border-color: #a78bfa; }
+    .last-row { font-size: 11px; color: #10b981; margin-bottom: 6px; letter-spacing: 0.3px; display: none; }
     .lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
     .val { font-size: 22px; font-weight: bold; color: #3b82f6; font-family: monospace; word-break: break-all; }
     .val.v6 { color: #a78bfa; font-size: 14px; }
@@ -188,14 +152,8 @@
   </div>
 
   <div class="card">
-    <div class="last-ip-block" id="last-ip-block" style="display:none;">
-      <div>
-        <div class="last-ip-label"><span class="last-ip-dot"></span>ไอพีล่าสุดที่บันทึก</div>
-        <div class="last-ip-val" id="last-ip-val">—</div>
-      </div>
-      <div class="last-ip-time" id="last-ip-time"></div>
-    </div>
     <div class="ip-block">
+      <div class="last-row" id="last-row">บันทึกล่าสุด — <span id="last-ip-time"></span></div>
       <div class="lbl">IPv4</div>
       <div class="val" id="ipv4">กำลังโหลด...</div>
     </div>
@@ -399,15 +357,14 @@
       const data = snap.val();
       const tbody = document.getElementById('log-body');
 
-      // แสดงไอพีล่าสุด
+      // แสดงบันทึกล่าสุดเหนือ IPv4
       if (data) {
         const entries = Object.values(data);
         const latest = entries[entries.length - 1];
-        document.getElementById('last-ip-block').style.display = 'flex';
-        document.getElementById('last-ip-val').textContent = latest.ip;
+        document.getElementById('last-row').style.display = 'block';
         document.getElementById('last-ip-time').textContent = latest.time;
       } else {
-        document.getElementById('last-ip-block').style.display = 'none';
+        document.getElementById('last-row').style.display = 'none';
       }
 
       if (!data) {
