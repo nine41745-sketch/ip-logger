@@ -8,42 +8,54 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 24px; }
 
-    /* Login Screen */
-    #login-screen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 90vh;
-    }
-    .login-card {
+    .center-screen { display: flex; align-items: center; justify-content: center; min-height: 90vh; }
+    .auth-card {
       background: #1e293b; border: 1px solid #334155; border-radius: 16px;
       padding: 40px; text-align: center; max-width: 340px; width: 100%;
     }
-    .login-card .icon { font-size: 48px; margin-bottom: 12px; }
-    .login-card h2 { font-size: 18px; color: #e2e8f0; margin-bottom: 6px; }
-    .login-card p { font-size: 13px; color: #64748b; margin-bottom: 28px; }
+    .auth-card .icon { font-size: 48px; margin-bottom: 12px; }
+    .auth-card h2 { font-size: 18px; color: #e2e8f0; margin-bottom: 6px; }
+    .auth-card p { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+
     .btn-google {
       display: flex; align-items: center; justify-content: center; gap: 10px;
       background: #fff; color: #1f2937; border: none; border-radius: 8px;
       padding: 12px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
-      width: 100%; transition: background 0.15s;
+      width: 100%; transition: background 0.15s; margin-bottom: 12px;
     }
     .btn-google:hover { background: #f1f5f9; }
-    .btn-google svg { width: 20px; height: 20px; }
+    .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .pin-input {
+      width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+      padding: 12px 16px; font-size: 20px; color: #e2e8f0; text-align: center;
+      letter-spacing: 8px; margin-bottom: 12px; outline: none;
+    }
+    .pin-input:focus { border-color: #3b82f6; }
+
+    .btn-primary {
+      width: 100%; background: #3b82f6; border: none; border-radius: 8px;
+      padding: 12px; font-size: 14px; color: #fff; font-weight: 500; cursor: pointer;
+      margin-bottom: 10px; transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #2563eb; }
+
+    .btn-link { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; text-decoration: underline; }
+    .btn-link:hover { color: #94a3b8; }
+
+    .msg-err { color: #fca5a5; font-size: 12px; margin-top: 8px; }
+    .msg-ok { color: #10b981; font-size: 12px; margin-top: 8px; }
 
     /* Main App */
     #app { display: none; }
-    .topbar {
-      max-width: 580px; margin: 0 auto 20px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .topbar { max-width: 580px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .topbar h1 { font-size: 18px; color: #94a3b8; }
-    .user-info { display: flex; align-items: center; gap: 10px; }
-    .user-info img { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #334155; }
+    .user-info { display: flex; align-items: center; gap: 8px; }
+    .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #334155; }
     .user-info span { font-size: 12px; color: #94a3b8; }
-    .btn-logout {
-      background: transparent; border: 1px solid #334155; color: #94a3b8;
-      padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
-    }
-    .btn-logout:hover { border-color: #ef4444; color: #fca5a5; }
+    .timer-badge { font-size: 11px; color: #f59e0b; background: #1c1208; border: 1px solid #f59e0b; border-radius: 6px; padding: 2px 8px; }
+    .btn-sm { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    .btn-sm:hover { border-color: #ef4444; color: #fca5a5; }
 
     .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; max-width: 580px; margin: 0 auto 20px; }
     .ip-block { background: #0f172a; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
@@ -51,16 +63,16 @@
     .lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
     .val { font-size: 22px; font-weight: bold; color: #3b82f6; font-family: monospace; word-break: break-all; }
     .val.v6 { color: #a78bfa; font-size: 14px; }
-    .status { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; }
+    .status { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; line-height: 1.6; }
     .s-loading { background: #1e3a5f; border: 1px solid #3b82f6; color: #93c5fd; }
     .s-ok { background: #064e3b; border: 1px solid #10b981; color: #10b981; }
     .s-err { background: #450a0a; border: 1px solid #ef4444; color: #fca5a5; }
+    .s-dup { background: #450a0a; border: 2px solid #ef4444; color: #fca5a5; font-weight: bold; }
 
     .sec { max-width: 580px; margin: 0 auto; }
     .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .sec-head h2 { font-size: 14px; color: #94a3b8; }
     .btn-clr { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 320px; }
     th { background: #1e293b; color: #64748b; padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -74,27 +86,55 @@
 </head>
 <body>
 
-<!-- หน้า Login -->
-<div id="login-screen">
-  <div class="login-card">
+<!-- 1. หน้า Google Login (ครั้งแรก) -->
+<div id="screen-google" class="center-screen">
+  <div class="auth-card">
     <div class="icon">🌐</div>
     <h2>IP Logger</h2>
-    <p>เข้าสู่ระบบเพื่อดูและบันทึก IP</p>
-    <button class="btn-google" id="btn-login">
+    <p>เข้าสู่ระบบด้วย Google</p>
+    <button class="btn-google" id="btn-google-login">
       <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6C12.2 13 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.4 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.3 0-11.6-4.2-13.6-10l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>
       Sign in with Google
     </button>
   </div>
 </div>
 
-<!-- หน้าหลัก (ซ่อนไว้ก่อน) -->
+<!-- 2. หน้าตั้งรหัสครั้งแรก -->
+<div id="screen-set-pin" class="center-screen" style="display:none;">
+  <div class="auth-card">
+    <div class="icon">🔐</div>
+    <h2>ตั้งรหัสผ่าน</h2>
+    <p>ตั้งรหัสสำหรับเข้าใช้ครั้งถัดไป<br>(ตัวเลขหรือตัวอักษร 4-20 ตัว)</p>
+    <input class="pin-input" type="password" id="set-pin1" placeholder="รหัสผ่าน" maxlength="20" style="letter-spacing:2px;">
+    <input class="pin-input" type="password" id="set-pin2" placeholder="ยืนยันรหัสผ่าน" maxlength="20" style="letter-spacing:2px; margin-top:8px;">
+    <button class="btn-primary" id="btn-set-pin">บันทึกรหัสผ่าน</button>
+    <div id="set-pin-msg"></div>
+  </div>
+</div>
+
+<!-- 3. หน้า Lock Screen (ใส่รหัส) -->
+<div id="screen-lock" class="center-screen" style="display:none;">
+  <div class="auth-card">
+    <div class="icon">🔒</div>
+    <h2>ล็อกหน้าจอ</h2>
+    <p>หมดเวลา 1 ชั่วโมง กรุณาใส่รหัสผ่าน</p>
+    <input class="pin-input" type="password" id="lock-pin" placeholder="รหัสผ่าน" maxlength="20" style="letter-spacing:2px;">
+    <button class="btn-primary" id="btn-unlock">ปลดล็อก</button>
+    <div id="lock-msg"></div>
+    <br>
+    <button class="btn-link" id="btn-forgot">ลืมรหัสผ่าน?</button>
+  </div>
+</div>
+
+<!-- 4. หน้าแอปหลัก -->
 <div id="app">
   <div class="topbar">
     <h1>🌐 IP Logger</h1>
     <div class="user-info">
       <img id="user-photo" src="" alt="">
       <span id="user-name"></span>
-      <button class="btn-logout" id="btn-logout">ออกจากระบบ</button>
+      <span class="timer-badge" id="timer-badge">⏱ 60:00</span>
+      <button class="btn-sm" id="btn-logout">ออกจากระบบ</button>
     </div>
   </div>
 
@@ -128,15 +168,11 @@
   </div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, push, onValue, remove, query, limitToFirst, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  // ============================================================
-  // ⚠️ แก้ค่าด้านล่างด้วย config จาก Firebase ของคุณ
-  // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyDLlGNBUvEEO8q1ksbynesGsyse4QjXSeY",
     authDomain: "iptest-61630.firebaseapp.com",
@@ -146,43 +182,134 @@
     messagingSenderId: "287152972552",
     appId: "1:287152972552:web:c700dd9219c90acbf0c2bd"
   };
-  // ============================================================
 
-  const ALLOWED_EMAIL = "nine41745@gmail.com"; // เฉพาะ email นี้เท่านั้น
+  const ALLOWED_EMAIL = "nine41745@gmail.com";
+  const SESSION_DURATION = 60 * 60 * 1000; // 1 ชั่วโมง
+  const PIN_KEY = 'ipl_pin_hash';
+  const SESSION_KEY = 'ipl_session_start';
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
   const logsRef = ref(db, 'ip_logs');
-  let loggedIn = false;
 
-  // Google Login
-  document.getElementById('btn-login').onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider());
-  };
+  let lockTimer = null;
+  let countdownInterval = null;
+  let appStarted = false;
 
-  // Logout
-  document.getElementById('btn-logout').onclick = () => signOut(auth);
+  // ฟังก์ชัน hash รหัสผ่าน
+  async function hashPin(pin) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
 
-  // ตรวจสอบสถานะ login
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if (user.email !== ALLOWED_EMAIL) {
-        signOut(auth);
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app').style.display = 'none';
-        alert('❌ ไม่มีสิทธิ์เข้าถึง');
+  function show(id) {
+    ['screen-google','screen-set-pin','screen-lock','app'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? (id === 'app' ? 'block' : 'flex') : 'none';
+    });
+  }
+
+  function startSessionTimer() {
+    clearTimeout(lockTimer);
+    clearInterval(countdownInterval);
+    const start = Date.now();
+    localStorage.setItem(SESSION_KEY, start);
+
+    countdownInterval = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const remaining = SESSION_DURATION - elapsed;
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+        lockScreen();
         return;
       }
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
+      const m = Math.floor(remaining / 60000).toString().padStart(2, '0');
+      const s = Math.floor((remaining % 60000) / 1000).toString().padStart(2, '0');
+      const badge = document.getElementById('timer-badge');
+      if (badge) badge.textContent = `⏱ ${m}:${s}`;
+    }, 1000);
+  }
+
+  function lockScreen() {
+    clearInterval(countdownInterval);
+    show('screen-lock');
+  }
+
+  // Google Login
+  document.getElementById('btn-google-login').onclick = () => {
+    signInWithPopup(auth, new GoogleAuthProvider()).catch(e => console.error(e));
+  };
+
+  // ตั้งรหัสครั้งแรก
+  document.getElementById('btn-set-pin').onclick = async () => {
+    const p1 = document.getElementById('set-pin1').value;
+    const p2 = document.getElementById('set-pin2').value;
+    const msg = document.getElementById('set-pin-msg');
+    if (p1.length < 4) { msg.className = 'msg-err'; msg.textContent = 'รหัสต้องมีอย่างน้อย 4 ตัว'; return; }
+    if (p1 !== p2) { msg.className = 'msg-err'; msg.textContent = 'รหัสไม่ตรงกัน'; return; }
+    localStorage.setItem(PIN_KEY, await hashPin(p1));
+    msg.className = 'msg-ok'; msg.textContent = '✅ บันทึกแล้ว';
+    setTimeout(() => { show('app'); if (!appStarted) { appStarted = true; startApp(); } startSessionTimer(); }, 800);
+  };
+
+  // ปลดล็อก
+  document.getElementById('btn-unlock').onclick = async () => {
+    const pin = document.getElementById('lock-pin').value;
+    const msg = document.getElementById('lock-msg');
+    const hash = await hashPin(pin);
+    if (hash === localStorage.getItem(PIN_KEY)) {
+      document.getElementById('lock-pin').value = '';
+      msg.textContent = '';
+      show('app');
+      startSessionTimer();
+    } else {
+      msg.className = 'msg-err'; msg.textContent = '❌ รหัสไม่ถูกต้อง';
+    }
+  };
+  document.getElementById('lock-pin').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-unlock').click(); });
+
+  // ลืมรหัส → Google re-auth
+  document.getElementById('btn-forgot').onclick = async () => {
+    try {
+      const result = await signInWithPopup(auth, new GoogleAuthProvider());
+      if (result.user.email !== ALLOWED_EMAIL) { signOut(auth); return; }
+      localStorage.removeItem(PIN_KEY);
+      document.getElementById('set-pin1').value = '';
+      document.getElementById('set-pin2').value = '';
+      document.getElementById('set-pin-msg').textContent = '';
+      show('screen-set-pin');
+    } catch(e) { console.error(e); }
+  };
+
+  // ออกจากระบบ
+  document.getElementById('btn-logout').onclick = () => {
+    clearInterval(countdownInterval);
+    localStorage.removeItem(PIN_KEY);
+    localStorage.removeItem(SESSION_KEY);
+    appStarted = false;
+    signOut(auth);
+  };
+
+  // ตรวจสอบ Firebase auth state
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      if (user.email !== ALLOWED_EMAIL) { signOut(auth); show('screen-google'); return; }
       document.getElementById('user-name').textContent = user.displayName;
       document.getElementById('user-photo').src = user.photoURL;
-      if (!loggedIn) { loggedIn = true; startApp(); }
+
+      const pinHash = localStorage.getItem(PIN_KEY);
+      if (!pinHash) {
+        // ยังไม่มีรหัส → ตั้งรหัสใหม่
+        show('screen-set-pin');
+      } else {
+        // มีรหัสแล้ว → เข้าใช้งาน
+        show('app');
+        if (!appStarted) { appStarted = true; startApp(); }
+        startSessionTimer();
+      }
     } else {
-      document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('app').style.display = 'none';
-      loggedIn = false;
+      show('screen-google');
+      clearInterval(countdownInterval);
     }
   });
 
@@ -191,7 +318,6 @@
   }
 
   function startApp() {
-    // ดึงข้อมูล real-time
     onValue(logsRef, (snap) => {
       const data = snap.val();
       const tbody = document.getElementById('log-body');
@@ -211,7 +337,6 @@
         </tr>
       `).join('');
     });
-
     logIP();
   }
 
@@ -221,24 +346,43 @@
 
   async function logIP() {
     let ipv4 = null, ipv6 = null;
-
     try {
-      const r4 = await fetch('https://api.ipify.org?format=json');
-      ipv4 = (await r4.json()).ip;
+      ipv4 = (await (await fetch('https://api.ipify.org?format=json')).json()).ip;
       document.getElementById('ipv4').textContent = ipv4;
     } catch { document.getElementById('ipv4').textContent = 'ดึงไม่ได้'; }
 
     try {
-      const r6 = await fetch('https://api6.ipify.org?format=json');
-      ipv6 = (await r6.json()).ip;
+      ipv6 = (await (await fetch('https://api6.ipify.org?format=json')).json()).ip;
       document.getElementById('ipv6').textContent = ipv6;
     } catch { document.getElementById('ipv6').textContent = 'ไม่รองรับ IPv6'; }
 
+    const s = document.getElementById('status');
     const now = fmt(new Date());
+
+    const existingSnap = await get(logsRef);
+    const existingIPs = existingSnap.exists() ? Object.values(existingSnap.val()).map(e => e.ip) : [];
+    const ipv4Dup = ipv4 && existingIPs.includes(ipv4);
+    const ipv6Dup = ipv6 && ipv6 !== ipv4 && existingIPs.includes(ipv6);
+
+    if (ipv4Dup || ipv6Dup) {
+      s.className = 'status s-dup';
+      s.innerHTML = '🔴 IP ซ้ำ! IP นี้เคยบันทึกไว้แล้ว<br>⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่';
+      return;
+    }
+
     if (ipv4) await push(logsRef, { ip: ipv4, type: 'IPv4', time: now });
     if (ipv6 && ipv6 !== ipv4) await push(logsRef, { ip: ipv6, type: 'IPv6', time: now });
 
-    const s = document.getElementById('status');
+    const MAX_LOGS = 500;
+    const snapAfter = await get(logsRef);
+    if (snapAfter.exists()) {
+      const keys = Object.keys(snapAfter.val());
+      if (keys.length > MAX_LOGS) {
+        const oldest = await get(query(logsRef, limitToFirst(keys.length - MAX_LOGS)));
+        oldest.forEach(child => remove(ref(db, 'ip_logs/' + child.key)));
+      }
+    }
+
     s.className = 'status s-ok';
     s.textContent = '✅ บันทึกลง Firebase แล้ว — ทุกเครื่องเห็นพร้อมกัน';
   }
