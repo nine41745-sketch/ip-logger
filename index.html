@@ -207,6 +207,7 @@
   const SESSION_DURATION = 60 * 60 * 1000; // 1 ชั่วโมง
   const PIN_KEY = 'ipl_pin_hash';
   const SESSION_KEY = 'ipl_session_start';
+  const LOCK_KEY = 'ipl_locked';
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -229,11 +230,12 @@
     });
   }
 
-  function startSessionTimer() {
+  function startSessionTimer(resumeFrom) {
     clearTimeout(lockTimer);
     clearInterval(countdownInterval);
-    const start = Date.now();
-    localStorage.setItem(SESSION_KEY, start);
+    // ถ้า resumeFrom มีค่า แปลว่า resume จาก session เดิม ไม่ต้องเขียนทับ
+    const start = resumeFrom || Date.now();
+    if (!resumeFrom) localStorage.setItem(SESSION_KEY, start);
 
     countdownInterval = setInterval(() => {
       const elapsed = Date.now() - start;
@@ -252,6 +254,7 @@
 
   function lockScreen() {
     clearInterval(countdownInterval);
+    localStorage.setItem(LOCK_KEY, '1'); // บันทึกสถานะล็อก
     show('screen-lock');
   }
 
@@ -280,8 +283,16 @@
     if (hash === localStorage.getItem(PIN_KEY)) {
       document.getElementById('lock-pin').value = '';
       msg.textContent = '';
+      localStorage.removeItem(LOCK_KEY); // ล้าง flag ล็อก
       show('app');
-      startSessionTimer();
+      // resume session เดิมถ้ายังไม่หมด ถ้าหมดแล้วเริ่มใหม่
+      const savedStart = parseInt(localStorage.getItem(SESSION_KEY) || '0');
+      const elapsed = Date.now() - savedStart;
+      if (savedStart && elapsed < SESSION_DURATION) {
+        startSessionTimer(savedStart);
+      } else {
+        startSessionTimer();
+      }
     } else {
       msg.className = 'msg-err'; msg.textContent = '❌ รหัสไม่ถูกต้อง';
     }
@@ -315,11 +326,26 @@
       if (!pinHash) {
         // ยังไม่มีรหัส → ตั้งรหัสใหม่
         show('screen-set-pin');
+      } else if (localStorage.getItem(LOCK_KEY)) {
+        // ถูกล็อกอยู่ (กด lock หรือหมดเวลา) → ให้ใส่รหัส
+        show('screen-lock');
       } else {
-        // มีรหัสแล้ว → เข้าใช้งาน
-        show('app');
-        if (!appStarted) { appStarted = true; startApp(); }
-        startSessionTimer();
+        // เช็คว่า session หมดเวลาหรือยัง
+        const savedStart = parseInt(localStorage.getItem(SESSION_KEY) || '0');
+        const elapsed = Date.now() - savedStart;
+        if (savedStart && elapsed >= SESSION_DURATION) {
+          // หมดเวลา → ล็อก
+          lockScreen();
+        } else {
+          // ยังปกติ → เข้าแอป (resume countdown)
+          show('app');
+          if (!appStarted) { appStarted = true; startApp(); }
+          if (savedStart && elapsed < SESSION_DURATION) {
+            startSessionTimer(savedStart);
+          } else {
+            startSessionTimer();
+          }
+        }
       }
     } else {
       show('screen-google');
