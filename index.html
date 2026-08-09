@@ -48,7 +48,8 @@
 
     /* Main App */
     #app { display: none; }
-    .topbar { max-width: 580px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .page { max-width: 900px; margin: 0 auto; }
+    .topbar { margin: 0 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .topbar h1 { font-size: 18px; color: #94a3b8; }
     .user-info { display: flex; align-items: center; gap: 8px; }
     .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #334155; }
@@ -57,7 +58,11 @@
     .btn-sm { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     .btn-sm:hover { border-color: #ef4444; color: #fca5a5; }
 
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; max-width: 580px; margin: 0 auto 20px; }
+    .layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+    .main-col { min-width: 0; }
+    @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
+
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; margin: 0 0 20px; }
     .ip-block { background: #0f172a; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
     .ip-block.v6 { border-color: #a78bfa; }
     .last-row { font-size: 11px; color: #10b981; margin-bottom: 6px; letter-spacing: 0.3px; display: none; }
@@ -70,7 +75,17 @@
     .s-err { background: #450a0a; border: 1px solid #ef4444; color: #fca5a5; }
     .s-dup { background: #450a0a; border: 2px solid #ef4444; color: #fca5a5; font-weight: bold; }
 
-    .sec { max-width: 580px; margin: 0 auto; }
+    .note-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 18px; }
+    .note-head { font-size: 13px; color: #94a3b8; font-weight: 600; margin-bottom: 10px; }
+    .note-textarea {
+      width: 100%; min-height: 220px; background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+      padding: 10px 12px; color: #e2e8f0; font-size: 13px; font-family: inherit; line-height: 1.5;
+      resize: vertical; outline: none;
+    }
+    .note-textarea:focus { border-color: #3b82f6; }
+    .note-status { font-size: 10px; color: #475569; margin-top: 6px; text-align: right; min-height: 14px; }
+
+    .sec { margin: 0; }
     .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
     .sec-head h2 { font-size: 14px; color: #94a3b8; }
     .sec-btns { display: flex; gap: 6px; }
@@ -141,51 +156,65 @@
 
 <!-- 4. หน้าแอปหลัก -->
 <div id="app">
-  <div class="topbar">
-    <h1>🌐 IP Logger</h1>
-    <div class="user-info">
-      <img id="user-photo" src="" alt="">
-      <span id="user-name"></span>
-      <span class="timer-badge" id="timer-badge">⏱ 60:00</span>
-      <button class="btn-sm" id="btn-lock">🔒 ล็อกหน้าจอ</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="ip-block">
-      <div class="last-row" id="last-row">บันทึกล่าสุด — <span id="last-ip-time"></span></div>
-      <div class="lbl">IPv4</div>
-      <div class="val" id="ipv4">กำลังโหลด...</div>
-    </div>
-    <div class="ip-block v6">
-      <div class="lbl">IPv6</div>
-      <div class="val v6" id="ipv6">กำลังโหลด...</div>
-    </div>
-    <div class="status s-loading" id="status">⏳ กำลังดึงข้อมูล...</div>
-  </div>
-
-  <div class="sec" id="sec">
-    <div class="sec-head">
-      <h2>📋 ประวัติทุกเครื่อง (<span id="count">0</span> รายการ)</h2>
-      <div class="sec-btns">
-        <button class="btn-cancel-sel" id="btn-cancel-sel" onclick="cancelSelect()">ยกเลิก</button>
-        <button class="btn-del-sel" id="btn-del-sel" onclick="deleteSelected()">ลบที่เลือก (<span id="sel-count">0</span>)</button>
-        <button class="btn-select" id="btn-select" onclick="toggleSelectMode()">เลือกลบ</button>
-        <button class="btn-clr" onclick="clearLog()">ลบทั้งหมด</button>
+  <div class="page">
+    <div class="topbar">
+      <h1>🌐 IP Logger</h1>
+      <div class="user-info">
+        <img id="user-photo" src="" alt="">
+        <span id="user-name"></span>
+        <span class="timer-badge" id="timer-badge">⏱ 60:00</span>
+        <button class="btn-sm" id="btn-lock">🔒 ล็อกหน้าจอ</button>
       </div>
     </div>
-    <div class="table-wrap">
-      <table id="log-table">
-        <thead>
-          <tr>
-            <th class="th-cb"><input type="checkbox" id="cb-all" style="accent-color:#3b82f6;width:14px;height:14px;" onchange="toggleAll(this)"></th>
-            <th>#</th><th>วันเวลา</th><th>IP Address</th><th>ชนิด</th>
-          </tr>
-        </thead>
-        <tbody id="log-body">
-          <tr><td colspan="5" class="empty">กำลังโหลดประวัติ...</td></tr>
-        </tbody>
-      </table>
+
+    <div class="layout">
+      <div class="main-col">
+        <div class="card">
+          <div class="ip-block">
+            <div class="last-row" id="last-row">บันทึกล่าสุด — <span id="last-ip-time"></span></div>
+            <div class="lbl">IPv4</div>
+            <div class="val" id="ipv4">กำลังโหลด...</div>
+          </div>
+          <div class="ip-block v6">
+            <div class="lbl">IPv6</div>
+            <div class="val v6" id="ipv6">กำลังโหลด...</div>
+          </div>
+          <div class="status s-loading" id="status">⏳ กำลังดึงข้อมูล...</div>
+        </div>
+
+        <div class="sec" id="sec">
+          <div class="sec-head">
+            <h2>📋 ประวัติทุกเครื่อง (<span id="count">0</span> รายการ)</h2>
+            <div class="sec-btns">
+              <button class="btn-cancel-sel" id="btn-cancel-sel" onclick="cancelSelect()">ยกเลิก</button>
+              <button class="btn-del-sel" id="btn-del-sel" onclick="deleteSelected()">ลบที่เลือก (<span id="sel-count">0</span>)</button>
+              <button class="btn-select" id="btn-select" onclick="toggleSelectMode()">เลือกลบ</button>
+              <button class="btn-clr" onclick="clearLog()">ลบทั้งหมด</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="log-table">
+              <thead>
+                <tr>
+                  <th class="th-cb"><input type="checkbox" id="cb-all" style="accent-color:#3b82f6;width:14px;height:14px;" onchange="toggleAll(this)"></th>
+                  <th>#</th><th>วันเวลา</th><th>IP Address</th><th>ชนิด</th>
+                </tr>
+              </thead>
+              <tbody id="log-body">
+                <tr><td colspan="5" class="empty">กำลังโหลดประวัติ...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-col">
+        <div class="note-card">
+          <div class="note-head">📝 Quick note</div>
+          <textarea class="note-textarea" id="quick-note" placeholder="จดอะไรเพิ่มเติม..."></textarea>
+          <div class="note-status" id="note-status"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -193,7 +222,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getDatabase, ref, push, onValue, remove, query, limitToFirst, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, push, onValue, remove, query, limitToFirst, limitToLast, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDLlGNBUvEEO8q1ksbynesGsyse4QjXSeY",
@@ -215,6 +244,7 @@
   const auth = getAuth(app);
   const db = getDatabase(app);
   const logsRef = ref(db, 'ip_logs');
+  const noteRef = ref(db, 'quick_note');
 
   let lockTimer = null;
   let countdownInterval = null;
@@ -311,9 +341,14 @@
   document.getElementById('btn-lock').onclick = () => lockScreen();
 
   // ตรวจสอบ Firebase auth state
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
       if (user.email !== ALLOWED_EMAIL) { signOut(auth); show('screen-google'); return; }
+
+      // สำคัญ: รอ token พร้อมก่อน ไม่งั้น push/get ครั้งแรกอาจถูก DB ปฏิเสธเงียบๆ
+      // (สาเหตุที่ก่อนหน้านี้ต้องรีเฟรชอีกครั้งถึงจะบันทึกได้)
+      try { await user.getIdToken(true); } catch (e) { console.error('getIdToken failed', e); }
+
       document.getElementById('user-name').textContent = user.displayName;
       document.getElementById('user-photo').src = user.photoURL;
 
@@ -458,7 +493,7 @@
     if (confirm('ลบประวัติทั้งหมดใน Firebase?')) remove(logsRef);
   };
 
-  async function logIP() {
+  async function logIP(retrying) {
     let ipv4 = null, ipv6 = null;
     try {
       ipv4 = (await (await fetch('https://api.ipify.org?format=json')).json()).ip;
@@ -473,33 +508,71 @@
     const s = document.getElementById('status');
     const now = fmt(new Date());
 
-    const existingSnap = await get(logsRef);
-    const existingIPs = existingSnap.exists() ? Object.values(existingSnap.val()).map(e => e.ip) : [];
-    const ipv4Dup = ipv4 && existingIPs.includes(ipv4);
-    const ipv6Dup = ipv6 && ipv6 !== ipv4 && existingIPs.includes(ipv6);
+    try {
+      const existingSnap = await get(logsRef);
+      const existingIPs = existingSnap.exists() ? Object.values(existingSnap.val()).map(e => e.ip) : [];
+      const ipv4Dup = ipv4 && existingIPs.includes(ipv4);
+      const ipv6Dup = ipv6 && ipv6 !== ipv4 && existingIPs.includes(ipv6);
 
-    if (ipv4Dup || ipv6Dup) {
-      s.className = 'status s-dup';
-      s.innerHTML = '🔴 IP ซ้ำ! IP นี้เคยบันทึกไว้แล้ว<br>⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่';
-      return;
-    }
+      if (ipv4Dup || ipv6Dup) {
+        s.className = 'status s-dup';
+        s.innerHTML = '🔴 IP ซ้ำ! IP นี้เคยบันทึกไว้แล้ว<br>⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่';
+        return;
+      }
 
-    if (ipv4) await push(logsRef, { ip: ipv4, type: 'IPv4', time: now });
-    if (ipv6 && ipv6 !== ipv4) await push(logsRef, { ip: ipv6, type: 'IPv6', time: now });
+      if (ipv4) await push(logsRef, { ip: ipv4, type: 'IPv4', time: now });
+      if (ipv6 && ipv6 !== ipv4) await push(logsRef, { ip: ipv6, type: 'IPv6', time: now });
 
-    const MAX_LOGS = 500;
-    const snapAfter = await get(logsRef);
-    if (snapAfter.exists()) {
-      const keys = Object.keys(snapAfter.val());
-      if (keys.length > MAX_LOGS) {
-        const oldest = await get(query(logsRef, limitToFirst(keys.length - MAX_LOGS)));
-        oldest.forEach(child => remove(ref(db, 'ip_logs/' + child.key)));
+      const MAX_LOGS = 500;
+      const snapAfter = await get(logsRef);
+      if (snapAfter.exists()) {
+        const keys = Object.keys(snapAfter.val());
+        if (keys.length > MAX_LOGS) {
+          const oldest = await get(query(logsRef, limitToFirst(keys.length - MAX_LOGS)));
+          oldest.forEach(child => remove(ref(db, 'ip_logs/' + child.key)));
+        }
+      }
+
+      s.className = 'status s-ok';
+      s.textContent = '✅ บันทึกลง Firebase แล้ว — ทุกเครื่องเห็นพร้อมกัน';
+    } catch (e) {
+      // ถ้า token ยังไม่พร้อม (มักเกิดตอนล็อกอินครั้งแรก) → รอแป๊บแล้วลองใหม่ 1 ครั้ง
+      console.error('logIP error', e);
+      if (!retrying) {
+        setTimeout(() => logIP(true), 1200);
+      } else {
+        s.className = 'status s-err';
+        s.textContent = '❌ บันทึกไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง';
       }
     }
-
-    s.className = 'status s-ok';
-    s.textContent = '✅ บันทึกลง Firebase แล้ว — ทุกเครื่องเห็นพร้อมกัน';
   }
+
+  // ---------- Quick Note (sync ผ่าน Firebase) ----------
+  let noteSaveTimer = null;
+  let noteLoadedOnce = false;
+  const noteEl = document.getElementById('quick-note');
+  const noteStatusEl = document.getElementById('note-status');
+
+  onValue(noteRef, (snap) => {
+    // อัปเดตค่าจาก Firebase เฉพาะตอนที่ผู้ใช้ไม่ได้กำลังพิมพ์อยู่ (ป้องกันเขียนทับ)
+    if (document.activeElement !== noteEl) {
+      noteEl.value = snap.val() || '';
+    }
+    noteLoadedOnce = true;
+  });
+
+  noteEl.addEventListener('input', () => {
+    noteStatusEl.textContent = 'กำลังพิมพ์...';
+    clearTimeout(noteSaveTimer);
+    noteSaveTimer = setTimeout(async () => {
+      try {
+        await set(noteRef, noteEl.value);
+        noteStatusEl.textContent = '✓ บันทึกแล้ว ' + new Date().toLocaleTimeString('th-TH');
+      } catch (e) {
+        noteStatusEl.textContent = '❌ บันทึกไม่สำเร็จ';
+      }
+    }, 700);
+  });
 </script>
 </body>
 </html>
