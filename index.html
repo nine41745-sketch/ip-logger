@@ -48,7 +48,7 @@
 
     /* Main App */
     #app { display: none; }
-    .page { max-width: 900px; margin: 0 auto; }
+    .page { max-width: 1240px; margin: 0 auto; }
     .topbar { margin: 0 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .topbar h1 { font-size: 18px; color: #94a3b8; }
     .user-info { display: flex; align-items: center; gap: 8px; }
@@ -58,9 +58,15 @@
     .btn-sm { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     .btn-sm:hover { border-color: #ef4444; color: #fca5a5; }
 
-    .layout { max-width: 580px; margin: 0 auto; }
+    .layout {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
 
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; margin: 0 0 20px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 16px; margin: 0; position: sticky; top: 18px; }
     .ip-block { background: #0f172a; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
     .ip-block.v6 { border-color: #a78bfa; }
     .last-row { font-size: 11px; color: #10b981; margin-bottom: 6px; letter-spacing: 0.3px; display: none; }
@@ -127,7 +133,7 @@
     }
     .btn-copy-note:hover { border-color: #4f46e5; color: #a5b4fc; }
 
-    .sec { margin: 0; }
+    .sec { margin: 0; min-width: 0; background: #111827; border: 1px solid #334155; border-radius: 14px; padding: 14px; }
     .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
     .sec-head h2 { font-size: 14px; color: #94a3b8; }
     .sec-btns { display: flex; gap: 6px; }
@@ -138,9 +144,9 @@
     .btn-clr:hover { background: #991b1b; }
     .btn-del-sel { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: none; }
     .btn-cancel-sel { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; display: none; }
-    .table-wrap { overflow-x: auto; }
+    .table-wrap { overflow: auto; max-height: calc(100vh - 165px); border-radius: 8px; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 320px; }
-    th { background: #1e293b; color: #64748b; padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    th { background: #1e293b; color: #64748b; padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 2; }
     td { padding: 9px 10px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-family: monospace; font-size: 11px; }
     tr:nth-child(even) td { background: #1e293b22; }
     tr.selected td { background: #1e3a5f44; }
@@ -152,6 +158,34 @@
     .select-mode .row-cb { display: inline-block; }
     .th-cb { display: none; }
     .select-mode .th-cb { display: table-cell; }
+
+    .dup-head { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .dup-group {
+      text-align: left; background: rgba(15,23,42,0.55); border: 1px solid #991b1b;
+      border-radius: 8px; padding: 9px 10px; margin-top: 7px;
+    }
+    .dup-title { font-size: 12px; font-weight: 700; color: #fecaca; margin-bottom: 3px; }
+    .dup-ip { font-family: monospace; font-size: 11px; color: #fda4af; word-break: break-all; margin-bottom: 6px; }
+    .dup-dates { display: flex; flex-wrap: wrap; gap: 5px; }
+    .dup-date {
+      font-size: 10px; color: #fecaca; background: rgba(127,29,29,0.45);
+      border: 1px solid rgba(239,68,68,0.35); border-radius: 5px; padding: 3px 6px;
+    }
+    .dup-hint { margin-top: 8px; font-size: 11px; color: #fca5a5; font-weight: 500; }
+
+    @media (max-width: 900px) {
+      body { padding: 12px; }
+      .page { max-width: 680px; }
+      .topbar { margin-bottom: 14px; }
+      .layout { display: block; }
+      .card { position: static; margin-bottom: 14px; padding: 14px; }
+      .sec { padding: 12px; }
+      .table-wrap { max-height: none; }
+      .user-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+      .ip-block { padding: 12px 14px; }
+      .val { font-size: 19px; }
+    }
+
   </style>
 </head>
 <body>
@@ -596,6 +630,35 @@
     if (confirm('ลบประวัติทั้งหมดใน Firebase?')) remove(logsRef);
   };
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[ch]);
+  }
+
+  function renderDuplicateGroup(label, ip, matches) {
+    const byDate = new Map();
+
+    // เรียงจากรายการล่าสุดก่อน แล้วสรุปจำนวนต่อวัน
+    [...matches].reverse().forEach(entry => {
+      const rawTime = typeof entry.time === 'string' ? entry.time.trim() : '';
+      const date = rawTime ? rawTime.split(/\s+/)[0] : 'ไม่ทราบวันที่';
+      byDate.set(date, (byDate.get(date) || 0) + 1);
+    });
+
+    const datesHtml = [...byDate.entries()]
+      .map(([date, count]) => `<span class="dup-date">📅 ${escapeHtml(date)} · ${count} ครั้ง</span>`)
+      .join('');
+
+    return `
+      <div class="dup-group">
+        <div class="dup-title">${escapeHtml(label)} ซ้ำ — พบในประวัติ ${matches.length} รายการ</div>
+        <div class="dup-ip">${escapeHtml(ip)}</div>
+        <div class="dup-dates">${datesHtml}</div>
+      </div>
+    `;
+  }
+
   async function logIP(retrying) {
     let ipv4 = null, ipv6 = null;
     try {
@@ -613,13 +676,26 @@
 
     try {
       const existingSnap = await get(logsRef);
-      const existingIPs = existingSnap.exists() ? Object.values(existingSnap.val()).map(e => e.ip) : [];
-      const ipv4Dup = ipv4 && existingIPs.includes(ipv4);
-      const ipv6Dup = ipv6 && ipv6 !== ipv4 && existingIPs.includes(ipv6);
+      const existingEntries = existingSnap.exists() ? Object.values(existingSnap.val()) : [];
 
-      if (ipv4Dup || ipv6Dup) {
+      const ipv4Matches = ipv4
+        ? existingEntries.filter(e => e && e.ip === ipv4)
+        : [];
+      const ipv6Matches = (ipv6 && ipv6 !== ipv4)
+        ? existingEntries.filter(e => e && e.ip === ipv6)
+        : [];
+
+      if (ipv4Matches.length || ipv6Matches.length) {
+        const duplicateGroups = [];
+        if (ipv4Matches.length) duplicateGroups.push(renderDuplicateGroup('IPv4', ipv4, ipv4Matches));
+        if (ipv6Matches.length) duplicateGroups.push(renderDuplicateGroup('IPv6', ipv6, ipv6Matches));
+
         s.className = 'status s-dup';
-        s.innerHTML = '🔴 IP ซ้ำ! IP นี้เคยบันทึกไว้แล้ว<br>⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่';
+        s.innerHTML = `
+          <div class="dup-head">🔴 พบ IP ซ้ำ</div>
+          ${duplicateGroups.join('')}
+          <div class="dup-hint">⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่</div>
+        `;
         return;
       }
 
