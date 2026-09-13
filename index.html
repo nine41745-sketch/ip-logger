@@ -6,7 +6,7 @@
   <title>IP Logger</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 24px; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 14px 16px; }
 
     .center-screen { display: flex; align-items: center; justify-content: center; min-height: 90vh; }
     .auth-card {
@@ -48,10 +48,10 @@
 
     /* Main App */
     #app { display: none; }
-    .page { max-width: 1240px; margin: 0 auto; }
-    .topbar { margin: 0 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .topbar h1 { font-size: 18px; color: #94a3b8; }
-    .user-info { display: flex; align-items: center; gap: 8px; }
+    .page { max-width: 1320px; margin: 0 auto; }
+    .topbar { margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 7px; min-height: 34px; }
+    .topbar h1 { font-size: 17px; color: #94a3b8; }
+    .user-info { display: flex; align-items: center; gap: 6px; }
     .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #334155; }
     .user-info span { font-size: 12px; color: #94a3b8; }
     .timer-badge { font-size: 11px; color: #f59e0b; background: #1c1208; border: 1px solid #f59e0b; border-radius: 6px; padding: 2px 8px; }
@@ -60,20 +60,17 @@
 
     .layout {
       width: 100%;
-      display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
+      display: block;
     }
 
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 16px; margin: 0; position: sticky; top: 18px; }
-    .ip-block { background: #0f172a; border: 1px solid #3b82f6; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
+    .card { background: #172033; border: 1px solid #334155; border-radius: 12px; padding: 10px; margin: 0 0 10px; }
+    .ip-block { background: #0f172a; border: 1px solid #3b82f6; border-radius: 8px; padding: 9px 12px; margin: 0; min-width: 0; }
     .ip-block.v6 { border-color: #a78bfa; }
-    .last-row { font-size: 11px; color: #10b981; margin-bottom: 6px; letter-spacing: 0.3px; display: none; }
-    .lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-    .val { font-size: 22px; font-weight: bold; color: #3b82f6; font-family: monospace; word-break: break-all; }
-    .val.v6 { color: #a78bfa; font-size: 14px; }
-    .status { margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; line-height: 1.6; }
+    .last-row { font-size: 10px; color: #10b981; margin-bottom: 3px; letter-spacing: 0.2px; display: none; }
+    .lbl { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+    .val { font-size: 19px; font-weight: 700; color: #3b82f6; font-family: monospace; word-break: break-all; line-height: 1.25; }
+    .val.v6 { color: #a78bfa; font-size: 13px; }
+    .status { margin-top: 8px; padding: 7px 9px; border-radius: 8px; font-size: 12px; text-align: center; line-height: 1.45; }
     .s-loading { background: #1e3a5f; border: 1px solid #3b82f6; color: #93c5fd; }
     .s-ok { background: #064e3b; border: 1px solid #10b981; color: #10b981; }
     .s-err { background: #450a0a; border: 1px solid #ef4444; color: #fca5a5; }
@@ -82,7 +79,7 @@
     /* Quick Notes - ปุ่มลอย + แผงเลื่อนออก */
     .note-fab {
       position: fixed; right: 22px; bottom: 22px; z-index: 40;
-      width: 50px; height: 50px; border-radius: 50%; border: none;
+      width: 44px; height: 44px; border-radius: 50%; border: none;
       background: #4f46e5; color: #fff; font-size: 20px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 14px rgba(79,70,229,0.45);
@@ -133,21 +130,21 @@
     }
     .btn-copy-note:hover { border-color: #4f46e5; color: #a5b4fc; }
 
-    .sec { margin: 0; min-width: 0; background: #111827; border: 1px solid #334155; border-radius: 14px; padding: 14px; }
-    .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-    .sec-head h2 { font-size: 14px; color: #94a3b8; }
-    .sec-btns { display: flex; gap: 6px; }
-    .btn-select { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .sec { margin: 0; min-width: 0; background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 10px; }
+    .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; flex-wrap: wrap; gap: 6px; }
+    .sec-head h2 { font-size: 13px; color: #94a3b8; }
+    .sec-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+    .btn-select { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 4px 9px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     .btn-select:hover { border-color: #3b82f6; color: #60a5fa; }
     .btn-select.active { background: #1e3a5f; border-color: #3b82f6; color: #60a5fa; }
-    .btn-clr { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .btn-clr { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 4px 9px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     .btn-clr:hover { background: #991b1b; }
-    .btn-del-sel { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: none; }
+    .btn-del-sel { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 4px 9px; border-radius: 6px; font-size: 11px; cursor: pointer; display: none; }
     .btn-cancel-sel { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; display: none; }
-    .table-wrap { overflow: auto; max-height: calc(100vh - 165px); border-radius: 8px; }
+    .table-wrap { overflow: auto; max-height: calc(100vh - 250px); min-height: 300px; border-radius: 8px; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 320px; }
-    th { background: #1e293b; color: #64748b; padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 2; }
-    td { padding: 9px 10px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-family: monospace; font-size: 11px; }
+    th { background: #1e293b; color: #64748b; padding: 7px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; position: sticky; top: 0; z-index: 2; }
+    td { padding: 6px 8px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-family: monospace; font-size: 10px; line-height: 1.25; }
     tr:nth-child(even) td { background: #1e293b22; }
     tr.selected td { background: #1e3a5f44; }
     .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
@@ -159,31 +156,54 @@
     .th-cb { display: none; }
     .select-mode .th-cb { display: table-cell; }
 
-    .dup-head { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .ip-grid {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px;
+    }
+    .dup-details { text-align: left; }
+    .dup-details > summary {
+      cursor: pointer; list-style: none; display: flex; align-items: center;
+      gap: 8px; min-height: 24px; font-size: 12px; font-weight: 700; color: #fecaca;
+      user-select: none;
+    }
+    .dup-details > summary::-webkit-details-marker { display: none; }
+    .dup-summary-main { min-width: 0; flex: 1; }
+    .dup-toggle {
+      flex: 0 0 auto; font-size: 10px; color: #fca5a5; font-weight: 500;
+      border: 1px solid rgba(239,68,68,0.35); border-radius: 5px; padding: 2px 6px;
+    }
+    .dup-details[open] .dup-toggle { font-size: 0; }
+    .dup-details[open] .dup-toggle::after { content: 'ย่อ'; font-size: 10px; }
+    .dup-content { padding-top: 6px; }
+    .dup-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
     .dup-group {
       text-align: left; background: rgba(15,23,42,0.55); border: 1px solid #991b1b;
-      border-radius: 8px; padding: 9px 10px; margin-top: 7px;
+      border-radius: 7px; padding: 7px 8px; min-width: 0;
     }
-    .dup-title { font-size: 12px; font-weight: 700; color: #fecaca; margin-bottom: 3px; }
-    .dup-ip { font-family: monospace; font-size: 11px; color: #fda4af; word-break: break-all; margin-bottom: 6px; }
-    .dup-dates { display: flex; flex-wrap: wrap; gap: 5px; }
+    .dup-title { font-size: 10.5px; font-weight: 700; color: #fecaca; margin-bottom: 2px; }
+    .dup-ip { font-family: monospace; font-size: 10px; color: #fda4af; word-break: break-all; margin-bottom: 4px; }
+    .dup-dates { display: flex; flex-wrap: wrap; gap: 4px; }
     .dup-date {
-      font-size: 10px; color: #fecaca; background: rgba(127,29,29,0.45);
-      border: 1px solid rgba(239,68,68,0.35); border-radius: 5px; padding: 3px 6px;
+      font-size: 9px; color: #fecaca; background: rgba(127,29,29,0.45);
+      border: 1px solid rgba(239,68,68,0.35); border-radius: 4px; padding: 2px 5px;
     }
-    .dup-hint { margin-top: 8px; font-size: 11px; color: #fca5a5; font-weight: 500; }
+    .dup-hint { margin-top: 5px; font-size: 9.5px; color: #fca5a5; font-weight: 500; }
 
     @media (max-width: 900px) {
-      body { padding: 12px; }
-      .page { max-width: 680px; }
-      .topbar { margin-bottom: 14px; }
-      .layout { display: block; }
-      .card { position: static; margin-bottom: 14px; padding: 14px; }
-      .sec { padding: 12px; }
-      .table-wrap { max-height: none; }
+      body { padding: 10px; }
+      .page { max-width: 760px; }
+      .topbar { margin-bottom: 8px; }
       .user-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
-      .ip-block { padding: 12px 14px; }
-      .val { font-size: 19px; }
+      .card { padding: 9px; margin-bottom: 9px; }
+      .sec { padding: 8px; }
+      .table-wrap { max-height: none; min-height: 0; }
+    }
+
+    @media (max-width: 640px) {
+      .ip-grid { grid-template-columns: 1fr; gap: 6px; }
+      .dup-groups { grid-template-columns: 1fr; }
+      .topbar h1 { width: 100%; }
+      .val { font-size: 18px; }
+      .val.v6 { font-size: 12px; }
     }
 
   </style>
@@ -246,14 +266,16 @@
 
     <div class="layout">
       <div class="card">
-        <div class="ip-block">
-          <div class="last-row" id="last-row">บันทึกล่าสุด — <span id="last-ip-time"></span></div>
-          <div class="lbl">IPv4</div>
-          <div class="val" id="ipv4">กำลังโหลด...</div>
-        </div>
-        <div class="ip-block v6">
-          <div class="lbl">IPv6</div>
-          <div class="val v6" id="ipv6">กำลังโหลด...</div>
+        <div class="ip-grid">
+          <div class="ip-block">
+            <div class="last-row" id="last-row">บันทึกล่าสุด — <span id="last-ip-time"></span></div>
+            <div class="lbl">IPv4</div>
+            <div class="val" id="ipv4">กำลังโหลด...</div>
+          </div>
+          <div class="ip-block v6">
+            <div class="lbl">IPv6</div>
+            <div class="val v6" id="ipv6">กำลังโหลด...</div>
+          </div>
         </div>
         <div class="status s-loading" id="status">⏳ กำลังดึงข้อมูล...</div>
       </div>
@@ -690,11 +712,23 @@
         if (ipv4Matches.length) duplicateGroups.push(renderDuplicateGroup('IPv4', ipv4, ipv4Matches));
         if (ipv6Matches.length) duplicateGroups.push(renderDuplicateGroup('IPv6', ipv6, ipv6Matches));
 
+        const duplicateSummary = [
+          ipv4Matches.length ? `IPv4 ${ipv4Matches.length} ครั้ง` : '',
+          ipv6Matches.length ? `IPv6 ${ipv6Matches.length} ครั้ง` : ''
+        ].filter(Boolean).join(' • ');
+
         s.className = 'status s-dup';
         s.innerHTML = `
-          <div class="dup-head">🔴 พบ IP ซ้ำ</div>
-          ${duplicateGroups.join('')}
-          <div class="dup-hint">⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่</div>
+          <details class="dup-details">
+            <summary>
+              <span class="dup-summary-main">🔴 พบ IP ซ้ำ — ${escapeHtml(duplicateSummary)}</span>
+              <span class="dup-toggle">ดูรายละเอียด</span>
+            </summary>
+            <div class="dup-content">
+              <div class="dup-groups">${duplicateGroups.join('')}</div>
+              <div class="dup-hint">⚠️ ลองรีสตาร์ทเราเตอร์หรือปิด-เปิด WiFi เพื่อขอ IP ใหม่</div>
+            </div>
+          </details>
         `;
         return;
       }
