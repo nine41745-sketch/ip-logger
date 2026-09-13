@@ -206,6 +206,7 @@
         <span id="user-name"></span>
         <span class="timer-badge" id="timer-badge">⏱ 60:00</span>
         <button class="btn-sm" id="btn-lock">🔒 ล็อกหน้าจอ</button>
+        <button class="btn-sm" id="btn-logout">🚪 ออกจากระบบ</button>
       </div>
     </div>
 
@@ -293,9 +294,15 @@
   const logsRef = ref(db, 'ip_logs');
   const noteRef = ref(db, 'quick_note');
 
+  // บังคับให้ Google แสดงหน้าเลือกบัญชีทุกครั้ง
+  const googleProvider = new GoogleAuthProvider();
+  googleProvider.setCustomParameters({ prompt: 'select_account' });
+
   let lockTimer = null;
   let countdownInterval = null;
   let appStarted = false;
+  let stopLogsListener = null;
+  let stopNoteListener = null;
 
   // ฟังก์ชัน hash รหัสผ่าน
   async function hashPin(pin) {
@@ -350,9 +357,21 @@
     show('screen-lock');
   }
 
+  function stopAppListeners() {
+    if (stopLogsListener) {
+      stopLogsListener();
+      stopLogsListener = null;
+    }
+    if (stopNoteListener) {
+      stopNoteListener();
+      stopNoteListener = null;
+    }
+    appStarted = false;
+  }
+
   // Google Login
   document.getElementById('btn-google-login').onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider()).catch(e => console.error(e));
+    signInWithPopup(auth, googleProvider).catch(e => console.error(e));
   };
 
   // ตั้งรหัสครั้งแรก
@@ -377,6 +396,7 @@
       msg.textContent = '';
       localStorage.removeItem(LOCK_KEY); // ล้าง flag ล็อก
       show('app');
+      if (!appStarted) { appStarted = true; startApp(); }
       startSessionTimer(); // reset 60 นาทีใหม่ทุกครั้งที่ปลดล็อก
     } else {
       msg.className = 'msg-err'; msg.textContent = '❌ รหัสไม่ถูกต้อง';
@@ -387,7 +407,7 @@
   // ลืมรหัส → Google re-auth
   document.getElementById('btn-forgot').onclick = async () => {
     try {
-      const result = await signInWithPopup(auth, new GoogleAuthProvider());
+      const result = await signInWithPopup(auth, googleProvider);
       if (result.user.email !== ALLOWED_EMAIL) { signOut(auth); return; }
       localStorage.removeItem(PIN_KEY);
       document.getElementById('set-pin1').value = '';
@@ -399,6 +419,19 @@
 
   // ล็อกหน้าจอ (ไม่ได้ logout จริง)
   document.getElementById('btn-lock').onclick = () => lockScreen();
+
+  // ออกจากระบบจริง แต่เก็บ PIN ของเครื่องไว้
+  document.getElementById('btn-logout').onclick = async () => {
+    clearInterval(countdownInterval);
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.setItem(LOCK_KEY, '1');
+    stopAppListeners();
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.error('signOut failed', e);
+    }
+  };
 
   // ตรวจสอบ Firebase auth state
   onAuthStateChanged(auth, async (user) => {
@@ -417,7 +450,7 @@
         // ยังไม่มีรหัส → ตั้งรหัสใหม่
         show('screen-set-pin');
       } else if (localStorage.getItem(LOCK_KEY)) {
-        // ถูกล็อกอยู่ (กด lock หรือหมดเวลา) → ให้ใส่รหัส
+        // ถูกล็อกอยู่ (กด lock, logout หรือหมดเวลา) → ให้ใส่รหัส
         show('screen-lock');
       } else {
         // เช็คว่า session หมดเวลาหรือยัง
@@ -438,6 +471,7 @@
         }
       }
     } else {
+      stopAppListeners();
       show('screen-google');
       clearInterval(countdownInterval);
     }
@@ -448,7 +482,7 @@
   }
 
   function startApp() {
-    onValue(logsRef, (snap) => {
+    stopLogsListener = onValue(logsRef, (snap) => {
       const data = snap.val();
       const tbody = document.getElementById('log-body');
 
@@ -479,6 +513,15 @@
         </tr>
       `).join('');
     });
+
+    stopNoteListener = onValue(noteRef, (snap) => {
+      // อัปเดตค่าจาก Firebase เฉพาะตอนที่ผู้ใช้ไม่ได้กำลังพิมพ์อยู่ (ป้องกันเขียนทับ)
+      if (document.activeElement !== noteEl) {
+        noteEl.value = snap.val() || '';
+      }
+      noteLoadedOnce = true;
+    });
+
     logIP();
   }
 
@@ -612,14 +655,6 @@
   let noteLoadedOnce = false;
   const noteEl = document.getElementById('quick-note');
   const noteStatusEl = document.getElementById('note-status');
-
-  onValue(noteRef, (snap) => {
-    // อัปเดตค่าจาก Firebase เฉพาะตอนที่ผู้ใช้ไม่ได้กำลังพิมพ์อยู่ (ป้องกันเขียนทับ)
-    if (document.activeElement !== noteEl) {
-      noteEl.value = snap.val() || '';
-    }
-    noteLoadedOnce = true;
-  });
 
   noteEl.addEventListener('input', () => {
     noteStatusEl.textContent = 'กำลังพิมพ์...';
