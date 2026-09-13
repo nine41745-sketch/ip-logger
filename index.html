@@ -156,6 +156,16 @@
     .th-cb { display: none; }
     .select-mode .th-cb { display: table-cell; }
 
+    .history-footer {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding-top: 8px; font-size: 10px; color: #64748b;
+    }
+    .btn-load-more {
+      background: transparent; border: 1px solid #334155; color: #94a3b8;
+      padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer;
+    }
+    .btn-load-more:hover { border-color: #3b82f6; color: #60a5fa; }
+
     .ip-grid {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px;
     }
@@ -303,6 +313,10 @@
             </tbody>
           </table>
         </div>
+        <div class="history-footer" id="history-footer" style="display:none;">
+          <span>แสดง <span id="visible-count">0</span> จาก <span id="total-count">0</span> รายการ</span>
+          <button class="btn-load-more" id="btn-load-more">โหลดเพิ่ม</button>
+        </div>
       </div>
     </div>
   </div>
@@ -359,6 +373,10 @@
   let appStarted = false;
   let stopLogsListener = null;
   let stopNoteListener = null;
+
+  const LOG_PAGE_SIZE = 200;
+  let allLogEntries = [];
+  let visibleLogCount = LOG_PAGE_SIZE;
 
   // ฟังก์ชัน hash รหัสผ่าน
   async function hashPin(pin) {
@@ -537,10 +555,55 @@
     return d.toLocaleDateString('th-TH') + ' ' + d.toLocaleTimeString('th-TH');
   }
 
+  function renderHistory() {
+    const tbody = document.getElementById('log-body');
+    const total = allLogEntries.length;
+    const visibleEntries = allLogEntries.slice(0, visibleLogCount);
+    const footer = document.getElementById('history-footer');
+    const loadMoreBtn = document.getElementById('btn-load-more');
+
+    document.getElementById('count').textContent = total;
+    document.getElementById('visible-count').textContent = visibleEntries.length;
+    document.getElementById('total-count').textContent = total;
+
+    if (!total) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">ยังไม่มีประวัติ</td></tr>';
+      footer.style.display = 'none';
+      return;
+    }
+
+    tbody.innerHTML = visibleEntries.map(([key, e], i) => `
+      <tr data-key="${key}">
+        <td class="th-cb" style="display:none;"><input type="checkbox" class="row-cb" onchange="updateSelCount()"></td>
+        <td>${total - i}</td>
+        <td>${escapeHtml(e.time)}</td>
+        <td>${escapeHtml(e.ip)}</td>
+        <td><span class="badge ${e.type === 'IPv6' ? 'b6' : 'b4'}">${escapeHtml(e.type)}</span></td>
+      </tr>
+    `).join('');
+
+    document.querySelectorAll('.th-cb').forEach(el => {
+      el.style.display = selectMode ? 'table-cell' : 'none';
+    });
+
+    footer.style.display = total > LOG_PAGE_SIZE ? 'flex' : 'none';
+    const remaining = Math.max(0, total - visibleEntries.length);
+    if (remaining > 0) {
+      loadMoreBtn.style.display = 'inline-block';
+      loadMoreBtn.textContent = `โหลดเพิ่ม (${Math.min(LOG_PAGE_SIZE, remaining)} รายการ)`;
+    } else {
+      loadMoreBtn.style.display = 'none';
+    }
+  }
+
+  document.getElementById('btn-load-more').onclick = () => {
+    visibleLogCount = Math.min(visibleLogCount + LOG_PAGE_SIZE, allLogEntries.length);
+    renderHistory();
+  };
+
   function startApp() {
     stopLogsListener = onValue(logsRef, (snap) => {
       const data = snap.val();
-      const tbody = document.getElementById('log-body');
 
       // แสดงบันทึกล่าสุดเหนือ IPv4
       if (data) {
@@ -552,22 +615,12 @@
         document.getElementById('last-row').style.display = 'none';
       }
 
-      if (!data) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">ยังไม่มีประวัติ</td></tr>';
-        document.getElementById('count').textContent = '0';
-        return;
-      }
-      const entries = Object.entries(data).reverse();
-      document.getElementById('count').textContent = entries.length;
-      tbody.innerHTML = entries.map(([key, e], i) => `
-        <tr data-key="${key}">
-          <td class="th-cb" style="display:none;"><input type="checkbox" class="row-cb" onchange="updateSelCount()"></td>
-          <td>${entries.length - i}</td>
-          <td>${e.time}</td>
-          <td>${e.ip}</td>
-          <td><span class="badge ${e.type === 'IPv6' ? 'b6' : 'b4'}">${e.type}</span></td>
-        </tr>
-      `).join('');
+      allLogEntries = data ? Object.entries(data).reverse() : [];
+      visibleLogCount = Math.min(
+        Math.max(LOG_PAGE_SIZE, visibleLogCount),
+        Math.max(LOG_PAGE_SIZE, allLogEntries.length)
+      );
+      renderHistory();
     });
 
     stopNoteListener = onValue(noteRef, (snap) => {
@@ -659,17 +712,19 @@
   }
 
   function renderDuplicateGroup(label, ip, matches) {
-    const byDate = new Map();
+    const byDateTime = new Map();
 
-    // เรียงจากรายการล่าสุดก่อน แล้วสรุปจำนวนต่อวัน
+    // เรียงจากรายการล่าสุดก่อน และแสดงทั้งวันที่ + เวลา
     [...matches].reverse().forEach(entry => {
       const rawTime = typeof entry.time === 'string' ? entry.time.trim() : '';
-      const date = rawTime ? rawTime.split(/\s+/)[0] : 'ไม่ทราบวันที่';
-      byDate.set(date, (byDate.get(date) || 0) + 1);
+      const dateTime = rawTime || 'ไม่ทราบวันเวลา';
+      byDateTime.set(dateTime, (byDateTime.get(dateTime) || 0) + 1);
     });
 
-    const datesHtml = [...byDate.entries()]
-      .map(([date, count]) => `<span class="dup-date">📅 ${escapeHtml(date)} · ${count} ครั้ง</span>`)
+    const datesHtml = [...byDateTime.entries()]
+      .map(([dateTime, count]) => `
+        <span class="dup-date">🕒 ${escapeHtml(dateTime)}${count > 1 ? ` · ${count} ครั้ง` : ''}</span>
+      `)
       .join('');
 
     return `
@@ -736,7 +791,7 @@
       if (ipv4) await push(logsRef, { ip: ipv4, type: 'IPv4', time: now });
       if (ipv6 && ipv6 !== ipv4) await push(logsRef, { ip: ipv6, type: 'IPv6', time: now });
 
-      const MAX_LOGS = 500;
+      const MAX_LOGS = 5000;
       const snapAfter = await get(logsRef);
       if (snapAfter.exists()) {
         const keys = Object.keys(snapAfter.val());
